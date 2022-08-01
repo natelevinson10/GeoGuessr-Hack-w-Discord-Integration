@@ -1,35 +1,43 @@
-from discord.ext.commands import bot
-import requests
-import discord
+import requests, time, discord
 from discord.ext import commands
 from discord_webhook import DiscordWebhook, DiscordEmbed
-from geohack import find
+from discord.ext.commands import bot
 
-#set prefix of commands to !
+def getLocation(gameID)
+ response = requests.get(f"https://www.geoguessr.com/api/v3/games/{gameID}")
+
+    obj = response.json()
+    round = obj['round']
+    lat = (obj["rounds"][round - 1]["lat"]) 
+    lng = (obj["rounds"][round - 1]["lng"])
+
+
+    headers = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36'
+    }
+
+    response2 = requests.get("https://api.opencagedata.com/geocode/v1/json?q=" + str(lat) + "+" + str(lng) + "&key=03c48dae07364cabb7f121d8c1519492", headers=  headers)
+    obj2 = response2.json()
+
+    formatted = (obj2["results"][0]["formatted"])
+    return formatted
+
+
 bot = commands.Bot(command_prefix="!")
 client = discord.Client()
 
-#make sure the bot is online
 @bot.event
 async def on_ready():
-    print("Bot is online!")
+    print("Everything's all ready to go~")
 
-#create command locate to return embed of location
 @bot.command()
-async def locate(ctx, gameID):
-
-    #create discord webhook
-    webhook = DiscordWebhook(url="DISCORD_WEBHOOK_HERE")
+async def find(ctx, gameID):
+    webhook = DiscordWebhook(url="DISCORD_WEBHOOK_URL")
     embed = DiscordEmbed (title="🗺️ Location Found! 👁️", color=2303786)
-    embed.set_footer(text='by n8te')
-    #refer to find in geohack.py and use list notaion to specify field from the find function call output
-    embed.add_embed_field(name= 'Coordinates: ', value='{}'.format((find(gameID))[1]), inline=False)
-    embed.add_embed_field(name= 'Location:', value='{}'.format((find(gameID))[0]), inline=False)
+    embed.set_footer(text='by n8te', icon_url = "https://wallpaperaccess.com/full/5036271.jpg%22")
+    embed.add_embed_field(name= 'Location:', value='{}'.format(getLocation(gameID)), inline=False)
     embed.set_timestamp()
     webhook.add_embed(embed)
-
-    #execute webhook :D
     response = webhook.execute()
 
-
-bot.run("BOT_TOKEN_HERE")
+bot.run("BOT_AUTH_KEY")
