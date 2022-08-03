@@ -3,9 +3,8 @@ from discord.ext import commands
 from discord_webhook import DiscordWebhook, DiscordEmbed
 from discord.ext.commands import bot
 
-def getLocation(gameID)
- response = requests.get(f"https://www.geoguessr.com/api/v3/games/{gameID}")
-
+def getLocation(gameID):
+    response = requests.get(f"https://www.geoguessr.com/api/v3/games/{gameID}")
     obj = response.json()
     round = obj['round']
     lat = (obj["rounds"][round - 1]["lat"]) 
